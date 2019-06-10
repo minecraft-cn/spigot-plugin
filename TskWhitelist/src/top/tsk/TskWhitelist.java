@@ -53,8 +53,8 @@ public class TskWhitelist extends JavaPlugin implements Listener {
   @Override
   public void onLoad() {
     if (!new File(getDataFolder(), "config.yml").exists()) {
-      saveDefaultConfig();
       initConfig();
+      saveConfig();
     }
   }
 
