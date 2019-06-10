@@ -1,3 +1,11 @@
 name: TskWhitelist
 main: top.tsk.TskWhitelist
 version: 2019.6.9
+author: tsk3
+website: mc.tsktop.top
+commands:
+  tskwhitelist:
+    description: a whitelist plugin made by tsk
+    aliases:
+      - twl
+    permission: tsk.whitelist
