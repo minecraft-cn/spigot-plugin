@@ -126,6 +126,16 @@ public class TskWhitelist extends JavaPlugin implements Listener {
               return 1;
             })
         )
+        .then(
+          LiteralArgumentBuilder.literal("msg")
+            .then(
+              RequiredArgumentBuilder.argument("Message", StringArgumentType.greedyString())
+                .executes((message) -> {
+                  refuseMessage = StringArgumentType.getString(message, "Message");
+                  return 1;
+                })
+            )
+        )
     );
   }
 
