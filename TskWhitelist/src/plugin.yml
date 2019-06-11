@@ -8,4 +8,5 @@ commands:
     description: a whitelist plugin made by tsk
     aliases:
       - twl
+      - bmd
     permission: tsk.whitelist
