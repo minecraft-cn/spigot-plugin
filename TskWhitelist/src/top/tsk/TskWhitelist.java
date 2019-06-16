@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
@@ -160,7 +161,7 @@ public class TskWhitelist extends JavaPlugin implements Listener {
   @Override
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-    int result;
+    int result = 0;
 
     String cmd = command.getName().concat(" ").concat(TskUtils.CombineStrings(args));
 
@@ -169,14 +170,16 @@ public class TskWhitelist extends JavaPlugin implements Listener {
       result = commandDispatcher.execute(cmd, sender);
     } catch (CommandSyntaxException e) {
       e.printStackTrace();
-      return false;
     }
 
     if (result == 0) {
+//      System.out.println(commandDispatcher.getSmartUsage(commandDispatcher.getRoot(), null).toString());
+      command.setUsage(ChatColor.RED + "/bmd + xxx");
       return false;
     }
 
     saveChanges();
+    sender.sendMessage(ChatColor.GREEN + "OK");
     return true;
   }
 
