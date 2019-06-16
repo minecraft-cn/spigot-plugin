@@ -39,6 +39,19 @@ public class TskWhitelist extends JavaPlugin implements Listener {
 
   CommandDispatcher<Object> commandDispatcher = new CommandDispatcher<>();
 
+  private void saveChanges() {
+
+    getConfig().set(CONFIG_REFUSE, refuseMessage);
+
+    getConfig().set(CONFIG_WHITE, whiteList);
+    getConfig().set(CONFIG_BLACK, blackList);
+    getConfig().set(CONFIG_GRAY, grayList);
+
+    getConfig().set(CONFIG_ENABLE, enable);
+
+
+    saveConfig();
+  }
 
   public void initConfig() {
     getConfig().set(CONFIG_REFUSE, "You are not in whitelist");
@@ -140,17 +153,7 @@ public class TskWhitelist extends JavaPlugin implements Listener {
 
   @Override
   public void onDisable() {
-
-    getConfig().set(CONFIG_REFUSE, refuseMessage);
-
-    getConfig().set(CONFIG_WHITE, whiteList);
-    getConfig().set(CONFIG_BLACK, blackList);
-    getConfig().set(CONFIG_GRAY, grayList);
-
-    getConfig().set(CONFIG_ENABLE, enable);
-
-
-    saveConfig();
+    saveChanges();
   }
 
 
@@ -173,6 +176,7 @@ public class TskWhitelist extends JavaPlugin implements Listener {
       return false;
     }
 
+    saveChanges();
     return true;
   }
 
