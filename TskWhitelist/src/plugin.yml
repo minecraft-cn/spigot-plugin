@@ -1,6 +1,6 @@
 name: TskWhitelist
 main: top.tsk.TskWhitelist
-version: 2019.6.11
+version: 2019.6.16
 author: tsk3
 website: mc.tsktop.top
 commands:
