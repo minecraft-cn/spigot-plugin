@@ -91,8 +91,8 @@ public class TskWhitelist extends JavaPlugin implements Listener {
           LiteralArgumentBuilder.literal("+")
             .then(
               RequiredArgumentBuilder.argument("PlayerName", StringArgumentType.greedyString())
-                .executes(player -> {
-                  String name = StringArgumentType.getString(player, "PlayerName");
+                .executes(commandContext -> {
+                  String name = StringArgumentType.getString(commandContext, "PlayerName");
                   if (!whiteList.contains(name)) {
                     whiteList.add(name);
                     return 1;
@@ -106,8 +106,8 @@ public class TskWhitelist extends JavaPlugin implements Listener {
           LiteralArgumentBuilder.literal("-")
             .then(
               RequiredArgumentBuilder.argument("PlayerName", StringArgumentType.greedyString())
-                .executes(player -> {
-                  String name = StringArgumentType.getString(player, "PlayerName");
+                .executes(commandContext -> {
+                  String name = StringArgumentType.getString(commandContext, "PlayerName");
                   if (whiteList.contains(name)) {
                     whiteList.remove(name);
                     return 1;
@@ -119,8 +119,8 @@ public class TskWhitelist extends JavaPlugin implements Listener {
         )
         .then(
           LiteralArgumentBuilder.literal(":")
-            .executes((commandSender) -> {
-              System.out.println(whiteList.toString());
+            .executes((commandContext) -> {
+              ((CommandSender) commandContext.getSource()).sendMessage(whiteList.toString());
               return 1;
             })
         )
