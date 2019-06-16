@@ -77,7 +77,7 @@ public class TskWhitelist extends JavaPlugin implements Listener {
         .then(
           LiteralArgumentBuilder.literal("+")
             .then(
-              RequiredArgumentBuilder.argument("PlayerName", StringArgumentType.word())
+              RequiredArgumentBuilder.argument("PlayerName", StringArgumentType.greedyString())
                 .executes(player -> {
                   String name = StringArgumentType.getString(player, "PlayerName");
                   if (!whiteList.contains(name)) {
@@ -86,14 +86,13 @@ public class TskWhitelist extends JavaPlugin implements Listener {
                   } else {
                     return 0;
                   }
-
                 })
             )
         )
         .then(
           LiteralArgumentBuilder.literal("-")
             .then(
-              RequiredArgumentBuilder.argument("PlayerName", StringArgumentType.word())
+              RequiredArgumentBuilder.argument("PlayerName", StringArgumentType.greedyString())
                 .executes(player -> {
                   String name = StringArgumentType.getString(player, "PlayerName");
                   if (whiteList.contains(name)) {
