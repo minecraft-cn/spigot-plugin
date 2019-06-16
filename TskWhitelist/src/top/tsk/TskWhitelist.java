@@ -31,9 +31,9 @@ public class TskWhitelist extends JavaPlugin implements Listener {
 
   String refuseMessage;
 
-  List whiteList;
-  List blackList;
-  List grayList;
+  List<String> whiteList;
+  List<String> blackList;
+  List<String> grayList;
 
   Boolean enable;
 
