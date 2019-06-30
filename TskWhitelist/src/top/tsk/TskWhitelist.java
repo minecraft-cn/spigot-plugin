@@ -96,6 +96,10 @@ public class TskWhitelist extends JavaPlugin implements Listener {
                   String name = StringArgumentType.getString(commandContext, "PlayerName");
                   if (!whiteList.contains(name)) {
                     whiteList.add(name);
+
+                    if (grayList.contains(name)) {
+                      grayList.remove(name);
+                    }
                   }
                   return 1;
                 })
