@@ -1,0 +1,12 @@
+name: TskWorldManager
+main: top.tsk.TskWorldManager
+version: 2019.6.30
+author: tsk3
+website: mc.tsktop.top
+commands:
+  tskworldmanager:
+    description: create or unload world
+    aliases:
+      - twm
+      - wm
+    permission: tsk.tskworldmanager
