@@ -55,7 +55,11 @@ public class TskWorldManager extends JavaPlugin implements Listener {
               RequiredArgumentBuilder.argument("WorldName", StringArgumentType.word())
                 .executes((commandSender) -> {
                   String worldName = StringArgumentType.getString(commandSender, "WorldName");
-                  Bukkit.unloadWorld(worldName, true);
+                  World world = Bukkit.getWorld(worldName);
+                  if (world == null) {
+                    return 0;
+                  }
+                  Bukkit.unloadWorld(world, true);
                   return 1;
                 })
             )
