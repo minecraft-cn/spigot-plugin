@@ -8,11 +8,13 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.libs.org.apache.commons.io.FileUtils;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import top.tsk.utils.TskUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,6 +62,27 @@ public class TskWorldManager extends JavaPlugin implements Listener {
                     return 0;
                   }
                   Bukkit.unloadWorld(world, true);
+                  return 1;
+                })
+            )
+        )
+        .then(
+          LiteralArgumentBuilder.literal("--")
+            .then(
+              RequiredArgumentBuilder.argument("WorldName", StringArgumentType.word())
+                .executes((commandSender) -> {
+                  String worldName = StringArgumentType.getString(commandSender, "WorldName");
+                  World world = Bukkit.getWorld(worldName);
+                  if (world == null) {
+                    return 0;
+                  }
+                  Bukkit.unloadWorld(world, true);
+                  try {
+                    FileUtils.deleteDirectory(world.getWorldFolder());
+                  } catch (IOException e) {
+                    e.printStackTrace();
+                    return 0;
+                  }
                   return 1;
                 })
             )
