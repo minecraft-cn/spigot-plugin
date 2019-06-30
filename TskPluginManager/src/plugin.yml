@@ -1,0 +1,12 @@
+name: TskPluginManager
+main: top.tsk.TskPluginManager
+version: 2019.6.30
+author: tsk3
+website: mc.tsktop.top
+commands:
+  tskpluginmanager:
+    description: disable/enable plugin
+    aliases:
+      - tpm
+      - pm
+    permission: tsk.tskpluginmanager
