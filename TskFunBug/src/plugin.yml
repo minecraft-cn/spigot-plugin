@@ -1,0 +1,6 @@
+api-version: "1.13"
+name: TskFunBug
+main: top.tsk.TskFunBug
+version: 2019.7.5
+author: tsk3
+website: mc.tsktop.top
