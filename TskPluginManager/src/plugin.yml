@@ -1,3 +1,4 @@
+api-version: "1.13"
 name: TskPluginManager
 main: top.tsk.TskPluginManager
 version: 2019.6.30
