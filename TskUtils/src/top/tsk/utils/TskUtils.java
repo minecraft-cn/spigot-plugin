@@ -1,5 +1,10 @@
 package top.tsk.utils;
 
+import org.bukkit.Material;
+import org.bukkit.attribute.Attributable;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.inventory.ItemStack;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,6 +34,23 @@ public class TskUtils {
     }
 
     return linkedList;
+  }
+
+  public static boolean IsItemEmpty(ItemStack itemStack) {
+    if (itemStack == null) {
+      return true;
+    }
+
+    if (itemStack.getType().equals(Material.AIR)) {
+      return true;
+    }
+
+    return false;
+  }
+
+
+  public static double GetMaxHealth(Attributable attributable) {
+    return attributable.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
   }
 }
 
