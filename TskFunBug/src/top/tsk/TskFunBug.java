@@ -25,8 +25,16 @@ import java.io.File;
 import java.util.Collection;
 
 public class TskFunBug extends JavaPlugin implements Listener {
-  boolean CreeperNoBlock = true;
-  boolean PlayerExpChangeEvent = true;
+
+  public boolean CreeperNoBlock = true;
+  public boolean ShowExp = true;
+  public boolean RideAny = true;
+  public boolean LeashAny = true;
+  public boolean TransferBuffToMonster = true;
+  public boolean HatEverything = true;
+  public boolean DropPotionOnDeath = true;
+  public boolean DropEquipmentForPoorPlayer = true;
+
 
   @Override
   public void onLoad() {
@@ -37,12 +45,13 @@ public class TskFunBug extends JavaPlugin implements Listener {
 
   @Override
   public void onEnable() {
+    TskUtils.LoadObject(this);
     getServer().getPluginManager().registerEvents(this, this);
   }
 
   @Override
   public void onDisable() {
-    saveConfig();
+    TskUtils.SaveObject(this);
   }
 
   @EventHandler
@@ -57,7 +66,7 @@ public class TskFunBug extends JavaPlugin implements Listener {
 
   @EventHandler
   public void ShowExp(PlayerExpChangeEvent event) {
-    if (!PlayerExpChangeEvent) {
+    if (!ShowExp) {
       return;
     }
     event.getPlayer().sendMessage(String.format("Exp + %s%d", ChatColor.GREEN, event.getAmount()));
@@ -65,6 +74,9 @@ public class TskFunBug extends JavaPlugin implements Listener {
 
   @EventHandler
   public void RideAny(PlayerInteractEntityEvent e) {
+    if (!RideAny) {
+      return;
+    }
     ItemStack itemMainHand = e.getPlayer().getEquipment().getItemInMainHand();
     if (TskUtils.IsItemEmpty(itemMainHand)) {
       return;
@@ -77,6 +89,9 @@ public class TskFunBug extends JavaPlugin implements Listener {
 
   @EventHandler
   public void LeashAny(PlayerInteractEntityEvent e) {
+    if (!LeashAny) {
+      return;
+    }
     ItemStack itemMainHand = e.getPlayer().getEquipment().getItemInMainHand();
     if (TskUtils.IsItemEmpty(itemMainHand)) {
       return;
@@ -91,6 +106,9 @@ public class TskFunBug extends JavaPlugin implements Listener {
 
   @EventHandler
   public void TransferBuffToMonster(PlayerDeathEvent event) {
+    if (!TransferBuffToMonster) {
+      return;
+    }
     Player player = event.getEntity();
     if (player.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
       Entity damager = ((EntityDamageByEntityEvent) player.getLastDamageCause()).getDamager();
@@ -110,6 +128,9 @@ public class TskFunBug extends JavaPlugin implements Listener {
 
   @EventHandler
   void HatEverything(InventoryClickEvent e) {
+    if (!HatEverything) {
+      return;
+    }
     if (e.getClickedInventory() == null) {
       return;
     }
@@ -130,6 +151,9 @@ public class TskFunBug extends JavaPlugin implements Listener {
 
   @EventHandler
   public void DropPotionOnDeath(EntityDeathEvent event) {
+    if (!DropPotionOnDeath) {
+      return;
+    }
     if (event.getEntity().getKiller() != null) {
       // 再加一个条件，比如玩家需要有【炼药】附魔或者手执火焰棒
       // 写到这里，突然想到，需要考虑玩家体验。你说以一种什么样的方式，玩家会玩得比较舒服，而不是喷【这是什么脑残设计？】
@@ -148,6 +172,9 @@ public class TskFunBug extends JavaPlugin implements Listener {
 
   @EventHandler
   public void DropEquipmentForPoorPlayer(EntityDeathEvent event) {
+    if (!DropEquipmentForPoorPlayer) {
+      return;
+    }
     if (!(event.getEntity() instanceof Monster)) {
       return;
     }
