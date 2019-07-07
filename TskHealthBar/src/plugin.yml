@@ -1,0 +1,6 @@
+api-version: "1.13"
+name: TskHealthBar
+main: top.tsk.TskHealthBar
+version: 2019.7.7
+author: tsk3
+website: mc.tsktop.top
