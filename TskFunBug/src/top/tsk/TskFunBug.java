@@ -100,6 +100,8 @@ public class TskFunBug extends JavaPlugin implements Listener {
       if (e.getRightClicked() instanceof LivingEntity) {
         e.setCancelled(true);
         ((LivingEntity) e.getRightClicked()).setLeashHolder(e.getPlayer());
+        itemMainHand.setAmount(itemMainHand.getAmount() - 1);
+        e.getPlayer().getEquipment().setItemInMainHand(itemMainHand);
       }
     }
   }
