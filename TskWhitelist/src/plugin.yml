@@ -1,9 +1,10 @@
 api-version: "1.13"
 name: TskWhitelist
 main: top.tsk.TskWhitelist
-version: 2019.6.30
+version: 2019.7.8
 author: tsk3
 website: mc.tsktop.top
+load: STARTUP
 commands:
   tskwhitelist:
     description: a whitelist plugin made by tsk
