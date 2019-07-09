@@ -3,6 +3,10 @@ package top.tsk.utils;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -69,5 +73,22 @@ public class TskUtils {
         e.printStackTrace();
       }
     }
+  }
+
+  public static Entity GetKiller(Entity entity) {
+    if (entity instanceof LivingEntity) {
+      return ((LivingEntity) entity).getKiller();
+    }
+    if (entity.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+      Entity damager = ((EntityDamageByEntityEvent) entity.getLastDamageCause()).getDamager();
+      if (damager instanceof Projectile) {
+        if (((Projectile) damager).getShooter() instanceof Entity) {
+          return ((Entity) ((Projectile) damager).getShooter());
+        }
+      } else {
+        return damager;
+      }
+    }
+    return null;
   }
 }
