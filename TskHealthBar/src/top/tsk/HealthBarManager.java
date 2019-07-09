@@ -14,6 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import top.tsk.utils.TskUtils;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -42,14 +43,16 @@ public class HealthBarManager implements Listener {
       @Override
       public void run() {
         for (Map.Entry<UUID, HealthBarView> entry : HealthBarList.entrySet()) {
-          for (Map.Entry<String, Integer> integerEntry : entry.getValue().timeoutList.entrySet()) {
+          Iterator<Map.Entry<String, Integer>> entryIterator = entry.getValue().timeoutList.entrySet().iterator();
+          while (entryIterator.hasNext()) {
+            Map.Entry<String, Integer> integerEntry = entryIterator.next();
             integerEntry.setValue(integerEntry.getValue() - 1);
             if (integerEntry.getValue() <= 0) {
               Player player = Bukkit.getPlayer(integerEntry.getKey());
               if (player != null) {
                 entry.getValue().bossBar.removePlayer(player);
               }
-              entry.getValue().timeoutList.remove(integerEntry.getKey());
+              entryIterator.remove();
             }
           }
         }
@@ -108,7 +111,6 @@ public class HealthBarManager implements Listener {
       HealthBarList.remove(damageable.getUniqueId());
       return;
     }
-
     if (HealthBarList.get(damageable.getUniqueId()).bossBar.getProgress() != event.getProgress()) {
       HealthBarList.get(damageable.getUniqueId()).bossBar.setProgress(event.getProgress());
     }
