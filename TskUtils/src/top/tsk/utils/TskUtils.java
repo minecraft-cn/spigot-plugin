@@ -1,18 +1,23 @@
 package top.tsk.utils;
 
+import com.sun.istack.internal.NotNull;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class TskUtils {
   public static String CombineStrings(String[] args) {
@@ -76,7 +81,8 @@ public class TskUtils {
   }
 
   public static Entity GetKiller(Entity entity) {
-    if (entity instanceof LivingEntity) {
+    if (entity instanceof LivingEntity &&
+      ((LivingEntity) entity).getKiller() != null) {
       return ((LivingEntity) entity).getKiller();
     }
     if (entity.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
@@ -90,5 +96,17 @@ public class TskUtils {
       }
     }
     return null;
+  }
+
+  public static Map<Enchantment, Integer> GetEnchants(@NotNull ItemStack itemStack) {
+    Map<Enchantment, Integer> enchants = new HashMap<>();
+    if (itemStack.hasItemMeta()) {
+      if (itemStack.getItemMeta() instanceof EnchantmentStorageMeta) {
+        enchants.putAll(((EnchantmentStorageMeta) itemStack.getItemMeta()).getStoredEnchants());
+      } else {
+        enchants.putAll(itemStack.getEnchantments());
+      }
+    }
+    return enchants;
   }
 }
