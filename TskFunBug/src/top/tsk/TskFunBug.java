@@ -1,5 +1,6 @@
 package top.tsk;
 
+import com.sun.istack.internal.NotNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -24,16 +25,13 @@ import org.bukkit.potion.PotionEffect;
 import top.tsk.utils.TskUtils;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 public class TskFunBug extends JavaPlugin implements Listener {
   public boolean CreeperNoBlock = true;
   public boolean ShowExp = true;
   public boolean RideAny = true;
-  public boolean LeashAny = false;
+  public boolean LeashAny = true;
   public boolean TransferBuffToNonPlayer = true;
   public boolean HatEverything = true;
   public boolean DropPotionWhenKilledByPlayer = true;
@@ -91,22 +89,50 @@ public class TskFunBug extends JavaPlugin implements Listener {
     }
   }
 
+  List<LivingEntity> getEntityLeashed(@NotNull Entity entity) {
+    List<LivingEntity> livingEntities = new LinkedList<>();
+    for (Entity entity1 : entity.getWorld().getEntities()) {
+      if (entity1 instanceof LivingEntity) {
+        try {
+          if (((LivingEntity) entity1).getLeashHolder().equals(entity)) {
+            livingEntities.add((LivingEntity) entity1);
+          }
+        } catch (IllegalStateException e) {
+        }
+      }
+    }
+    return livingEntities;
+  }
+
   @EventHandler
   public void LeashAny(PlayerInteractEntityEvent e) {
     if (!LeashAny) {
       return;
     }
+
     ItemStack itemMainHand = e.getPlayer().getEquipment().getItemInMainHand();
-    if (TskUtils.IsItemEmpty(itemMainHand)) {
-      return;
-    }
-    if (itemMainHand.getType().equals(Material.LEAD) &&
-      e.getRightClicked() instanceof LivingEntity
-    ) {
+    List<LivingEntity> entityLeashed = getEntityLeashed(e.getPlayer());
+
+    if (!TskUtils.IsItemEmpty(itemMainHand) &&
+      itemMainHand.getType().equals(Material.LEAD) &&
+      e.getRightClicked() instanceof LivingEntity &&
+      !entityLeashed.contains(e.getRightClicked())) {
       e.setCancelled(true);
+
       ((LivingEntity) e.getRightClicked()).setLeashHolder(e.getPlayer());
       itemMainHand.setAmount(itemMainHand.getAmount() - 1);
       e.getPlayer().getEquipment().setItemInMainHand(itemMainHand);
+      return;
+    }
+
+    if ((TskUtils.IsItemEmpty(itemMainHand) || !TskUtils.IsItemEmpty(itemMainHand) && !itemMainHand.getType().equals(Material.LEAD)) &&
+//      e.getRightClicked() instanceof LivingEntity &&
+      !entityLeashed.isEmpty() && !entityLeashed.contains(e.getRightClicked())) {
+      e.setCancelled(true);
+      for (LivingEntity livingEntity : entityLeashed) {
+        livingEntity.setLeashHolder(e.getRightClicked());
+      }
+      return;
     }
   }
 
@@ -334,7 +360,6 @@ public class TskFunBug extends JavaPlugin implements Listener {
       return;
     }
     Map<Enchantment, Integer> enchants3 = TskUtils.GetEnchants(result);
-
     int extraCost = 0;
     for (Map.Entry<Enchantment, Integer> entry : enchants3.entrySet()) {
       if (entry.getKey().getMaxLevel() == 1) {
