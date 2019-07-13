@@ -439,6 +439,32 @@ public class TskFunBug extends JavaPlugin implements Listener {
 //      System.out.println(field.getName() + "\t" + field.getType());
 //    }
 //  }
+
+  @EventHandler
+  public void UpgradeOnKill(EntityDeathEvent event) {
+    if (!UpgradeOnKill) {
+      return;
+    }
+
+    // if killed by player, return
+    if (event.getEntity().getKiller() != null) {
+      return;
+    }
+
+    LivingEntity entity = event.getEntity();
+    Entity killer = TskUtils.GetKiller(entity);
+    if (killer == null) {
+      return;
+    }
+    if (!(killer instanceof LivingEntity)) {
+      return;
+    }
+
+    LivingEntity livingEntity = (LivingEntity) killer;
+    TskUtils.AddMaxHealth(livingEntity, TskUtils.GetMaxHealth(entity));
+    TskUtils.Heal(livingEntity);
+    livingEntity.setRemoveWhenFarAway(false);
+  }
 }
 
 
