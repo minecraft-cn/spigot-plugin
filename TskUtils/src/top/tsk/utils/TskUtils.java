@@ -4,6 +4,7 @@ import com.sun.istack.internal.NotNull;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -53,6 +54,14 @@ public class TskUtils {
 
   public static double GetMaxHealth(Attributable attributable) {
     return attributable.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+  }
+
+  public static void AddMaxHealth(Attributable attributable, double value) {
+    attributable.getAttribute(Attribute.GENERIC_MAX_HEALTH).addModifier(new AttributeModifier(Attribute.GENERIC_MAX_HEALTH.name(), value, AttributeModifier.Operation.ADD_NUMBER));
+  }
+
+  public static void Heal(LivingEntity livingEntity) {
+    livingEntity.setHealth(GetMaxHealth(livingEntity));
   }
 
   public static void SaveObject(JavaPlugin javaPlugin) {
@@ -108,5 +117,9 @@ public class TskUtils {
       }
     }
     return enchants;
+  }
+
+  public static int RandomInt(int min,int max){
+    return Double.valueOf(Math.random()*(max-min)+min).intValue();
   }
 }
