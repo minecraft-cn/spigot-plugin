@@ -31,12 +31,14 @@ public class TskFunBug extends JavaPlugin implements Listener {
   public boolean CreeperNoBlock = true;
   public boolean ShowExp = true;
   public boolean RideAny = true;
-  public boolean LeashAny = true;
+  public boolean LeashAny = false;
   public boolean TransferBuffToNonPlayer = true;
   public boolean HatEverything = true;
   public boolean DropPotionWhenKilledByPlayer = true;
   public boolean DropEquipmentForPoorPlayer = true;
   public boolean OverMaxEnchLevelToX = true;
+  public boolean MoreExp = true;
+  public boolean UpgradeOnKill = true;
 
   @Override
   public void onLoad() {
@@ -54,6 +56,22 @@ public class TskFunBug extends JavaPlugin implements Listener {
   @Override
   public void onDisable() {
     TskUtils.SaveObject(this);
+  }
+
+  @EventHandler
+  public void MoreExp(EntityDeathEvent e) {
+    if (!MoreExp) {
+      return;
+    }
+    if (!(e.getEntity() instanceof Mob)) {
+      return;
+    }
+    if (((Mob) e.getEntity()).getTarget() == null) {
+      return;
+    }
+
+    int i = Double.valueOf(TskUtils.GetMaxHealth(e.getEntity())).intValue() / 10;
+    e.setDroppedExp(e.getDroppedExp() + TskUtils.RandomInt(0, i));
   }
 
   @EventHandler
@@ -113,6 +131,7 @@ public class TskFunBug extends JavaPlugin implements Listener {
     ItemStack itemMainHand = e.getPlayer().getEquipment().getItemInMainHand();
     List<LivingEntity> entityLeashed = getEntityLeashed(e.getPlayer());
 
+    // leash one
     if (!TskUtils.IsItemEmpty(itemMainHand) &&
       itemMainHand.getType().equals(Material.LEAD) &&
       e.getRightClicked() instanceof LivingEntity &&
@@ -125,6 +144,17 @@ public class TskFunBug extends JavaPlugin implements Listener {
       return;
     }
 
+    // take one
+    if (e.getRightClicked() instanceof LivingEntity &&
+      !((LivingEntity) e.getRightClicked()).getLeashHolder().isEmpty() &&
+      !((LivingEntity) e.getRightClicked()).getLeashHolder().equals(e.getPlayer())) {
+      e.setCancelled(true);
+      ((LivingEntity) e.getRightClicked()).setLeashHolder(e.getPlayer());
+      return;
+    }
+
+
+    // give all
     if ((TskUtils.IsItemEmpty(itemMainHand) || !TskUtils.IsItemEmpty(itemMainHand) && !itemMainHand.getType().equals(Material.LEAD)) &&
 //      e.getRightClicked() instanceof LivingEntity &&
       !entityLeashed.isEmpty() && !entityLeashed.contains(e.getRightClicked())) {
@@ -132,6 +162,15 @@ public class TskFunBug extends JavaPlugin implements Listener {
       for (LivingEntity livingEntity : entityLeashed) {
         livingEntity.setLeashHolder(e.getRightClicked());
       }
+      return;
+    }
+
+    // take all
+    if (e.getRightClicked() instanceof LivingEntity &&
+      !((LivingEntity) e.getRightClicked()).getLeashHolder().isEmpty() &&
+      !((LivingEntity) e.getRightClicked()).getLeashHolder().equals(e.getPlayer())) {
+      e.setCancelled(true);
+      ((LivingEntity) e.getRightClicked()).setLeashHolder(e.getPlayer());
       return;
     }
   }
@@ -201,10 +240,15 @@ public class TskFunBug extends JavaPlugin implements Listener {
       }
       livingEntity.addPotionEffects(potionEffects);
     }
+
     livingEntity.setRemoveWhenFarAway(false);
+
     for (PotionEffect potionEffect : entity.getActivePotionEffects()) {
       entity.removePotionEffect(potionEffect.getType());
     }
+
+    TskUtils.AddMaxHealth(livingEntity, TskUtils.GetMaxHealth(entity));
+    TskUtils.Heal(livingEntity);
   }
 
   @EventHandler
@@ -304,86 +348,66 @@ public class TskFunBug extends JavaPlugin implements Listener {
     }
   }
 
-  Collection<PotionEffect> combineEnch(Collection<PotionEffect> p1, Collection<PotionEffect> p2) {
-    Collection<PotionEffect> result = new LinkedList<>();
-    Iterator<PotionEffect> iterator1 = p1.iterator();
-    Iterator<PotionEffect> iterator2 = p2.iterator();
-    while (iterator1.hasNext()) {
-      PotionEffect potionEffect1 = iterator1.next();
-      while (iterator2.hasNext()) {
-        PotionEffect potionEffect2 = iterator2.next();
-        if (potionEffect2.getType().equals(potionEffect1.getType())) {
-          int amplifier;
-          long duration;
-          if (potionEffect1.getAmplifier() == potionEffect2.getAmplifier()) {
-            amplifier = potionEffect1.getAmplifier() + 1;
-            if (amplifier > 10) {
-              amplifier = 10;
-            }
-            duration = potionEffect1.getDuration() + potionEffect2.getDuration();
-            if (duration > Integer.MAX_VALUE) {
-              duration = Integer.MAX_VALUE;
-            }
-          } else {
-            amplifier = potionEffect1.getAmplifier() > potionEffect2.getAmplifier() ? potionEffect1.getAmplifier() : potionEffect2.getAmplifier();
-            duration = potionEffect1.getDuration() > potionEffect2.getDuration() ? potionEffect1.getDuration() : potionEffect2.getDuration();
-          }
-          result.add(new PotionEffect(potionEffect1.getType(), ((int) duration), amplifier));
-          iterator1.remove();
-          iterator2.remove();
-          break;
-        }
-      }
-    }
-    result.addAll(p1);
-    result.addAll(p2);
-    return result;
-  }
-
   @EventHandler
   public void OverMaxEnchLevelToX(PrepareAnvilEvent event) {
     if (!OverMaxEnchLevelToX) {
       return;
     }
-    if (TskUtils.IsItemEmpty(event.getResult())) {
+
+    event.getInventory().setMaximumRepairCost(Integer.MAX_VALUE);
+
+    ItemStack itemStack1 = event.getInventory().getItem(0);
+    if (TskUtils.IsItemEmpty(itemStack1)) {
       return;
     }
-    ItemStack itemStack1 = event.getInventory().getItem(0);
     ItemStack itemStack2 = event.getInventory().getItem(1);
+    if (TskUtils.IsItemEmpty(itemStack2)) {
+      return;
+    }
     ItemStack result = event.getResult();
+    if (TskUtils.IsItemEmpty(result)) {
+      return;
+    }
+
     Map<Enchantment, Integer> enchants1 = TskUtils.GetEnchants(itemStack1);
     if (enchants1.isEmpty()) {
       return;
     }
     Map<Enchantment, Integer> enchants2 = TskUtils.GetEnchants(itemStack2);
-    if (enchants1.isEmpty()) {
+    if (enchants2.isEmpty()) {
       return;
     }
-    Map<Enchantment, Integer> enchants3 = TskUtils.GetEnchants(result);
+
     int extraCost = 0;
-    for (Map.Entry<Enchantment, Integer> entry : enchants3.entrySet()) {
-      if (entry.getKey().getMaxLevel() == 1) {
-        continue;
-      }
-      if (enchants1.containsKey(entry.getKey()) && enchants2.containsKey(entry.getKey())) {
-        if (enchants1.get(entry.getKey()).equals(enchants2.get(entry.getKey()))) {
-          if (enchants1.get(entry.getKey()) >= entry.getKey().getMaxLevel()) {
-            Integer level = enchants1.get(entry.getKey()) + 1;
-            if (level > 10) {
-              level = 10;
-            }
-            extraCost += level;
-            entry.setValue(level);
+    Map<Enchantment, Integer> enchants3 = new HashMap<>();
+    Iterator<Map.Entry<Enchantment, Integer>> iterator1 = enchants1.entrySet().iterator();
+    while (iterator1.hasNext()) {
+      Map.Entry<Enchantment, Integer> entry1 = iterator1.next();
+      if (enchants2.containsKey(entry1.getKey())) {
+        int level;
+        if (entry1.getValue().equals(enchants2.get(entry1.getKey()))) {
+          level = entry1.getValue() + 1;
+          if (level > 10) {
+            level = 10;
           }
+          extraCost = extraCost + level;
         } else {
-          Integer level = enchants1.get(entry.getKey()) > enchants2.get(entry.getKey()) ?
-            enchants1.get(entry.getKey()) : enchants2.get(entry.getKey());
-          if (level > entry.getKey().getMaxLevel()) {
-            entry.setValue(level);
-          }
+          level = entry1.getValue() > enchants2.get(entry1.getKey()) ? entry1.getValue() : enchants2.get(entry1.getKey());
         }
+        iterator1.remove();
+        enchants2.remove(entry1.getKey());
+        enchants3.put(entry1.getKey(), level);
       }
     }
+
+
+    for (Map.Entry<Enchantment, Integer> entry : enchants1.entrySet()) {
+      enchants3.put(entry.getKey(), entry.getValue());
+    }
+    for (Map.Entry<Enchantment, Integer> entry : enchants2.entrySet()) {
+      enchants3.put(entry.getKey(), entry.getValue());
+    }
+
     ItemMeta resultItemMeta = result.getItemMeta();
     if (resultItemMeta instanceof EnchantmentStorageMeta) {
       for (Map.Entry<Enchantment, Integer> entry : enchants3.entrySet()) {
@@ -393,9 +417,13 @@ public class TskFunBug extends JavaPlugin implements Listener {
     } else {
       result.addUnsafeEnchantments(enchants3);
     }
+
     event.setResult(result);
     event.getInventory().setRepairCost(event.getInventory().getRepairCost() + extraCost);
-    event.getInventory().setMaximumRepairCost(event.getInventory().getMaximumRepairCost() + extraCost);
+
+    if (event.getInventory().getRepairCost() >= 40) {
+      event.getView().getPlayer().sendMessage(String.format("将花费经验%s%d%s级", ChatColor.GREEN, event.getInventory().getRepairCost(), ChatColor.RESET));
+    }
   }
 //
 //  String textures = "textures";
@@ -412,4 +440,5 @@ public class TskFunBug extends JavaPlugin implements Listener {
 //    }
 //  }
 }
-    
+
+
