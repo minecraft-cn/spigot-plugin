@@ -5,10 +5,12 @@ import org.bukkit.attribute.Attributable;
 import org.bukkit.entity.Boss;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import top.tsk.utils.TskUtils;
@@ -23,10 +25,6 @@ public class TskHealthBar extends JavaPlugin implements Listener {
   public void onEnable() {
     getServer().getPluginManager().registerEvents(new EventCaller(), this);
     getServer().getPluginManager().registerEvents(this, this);
-
-    getServer().getPluginManager().registerEvents(healthBarManager, this);
-    getServer().getPluginManager().registerEvents(healthBarManager, this);
-    getServer().getPluginManager().registerEvents(healthBarManager, this);
     getServer().getPluginManager().registerEvents(healthBarManager, this);
     healthBarManager.removeBarFromPlayerForTimeout();
   }
@@ -72,10 +70,15 @@ public class TskHealthBar extends JavaPlugin implements Listener {
 
   @EventHandler
   public void removeBarOnDeath(EntityDeathEvent event) {
-    Entity entity = event.getEntity();
+    Damageable entity = event.getEntity();
+    Bukkit.getPluginManager().callEvent(new HealthChangeEvent(entity, 0));
+  }
 
-
-    Bukkit.getPluginManager().callEvent(new HealthChangeEvent(((Damageable) entity), 0));
+  @EventHandler
+  public void removeBarOnCreeperExplode(EntityExplodeEvent event) {
+    if (event.getEntity().getType().equals(EntityType.CREEPER)) {
+      Bukkit.getPluginManager().callEvent(new HealthChangeEvent(((Damageable) event.getEntity()), 0));
+    }
   }
 
   @EventHandler

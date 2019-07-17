@@ -40,7 +40,7 @@ public class TskTidyChest extends JavaPlugin implements Listener {
     if (!e.getClick().equals(ClickType.MIDDLE)) {
       return;
     }
-    if (e.getWhoClicked().getGameMode().equals(GameMode.CREATIVE)) {
+    if (e.getWhoClicked().getGameMode().equals(GameMode.CREATIVE) && !TskUtils.IsItemEmpty(e.getCurrentItem())) {
       return;
     }
     if (e.getClickedInventory().getType().equals(InventoryType.PLAYER)) {

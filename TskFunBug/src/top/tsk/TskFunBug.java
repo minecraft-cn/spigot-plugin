@@ -445,7 +445,11 @@ public class TskFunBug extends JavaPlugin implements Listener {
     if (killer == null) {
       return;
     }
+
     if (!(killer instanceof LivingEntity)) {
+      return;
+    }
+    if (killer instanceof Player) {
       return;
     }
 
