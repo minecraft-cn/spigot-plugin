@@ -1,14 +1,20 @@
 package top.tsk;
 
 import com.sun.istack.internal.NotNull;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -89,7 +95,18 @@ public class TskFunBug extends JavaPlugin implements Listener {
     if (!ShowExp) {
       return;
     }
+
     event.getPlayer().sendMessage(String.format("Exp + %s%d", ChatColor.GREEN, event.getAmount()));
+
+
+    event.getPlayer().giveExp(event.getAmount());
+    event.setAmount(0);
+
+    int expToLevel = event.getPlayer().getExpToLevel();
+    int exp = Math.round(event.getPlayer().getExp() * expToLevel);
+    event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(
+      String.format("%d / %d", exp, expToLevel), net.md_5.bungee.api.ChatColor.GREEN)
+    );
   }
 
   @EventHandler
