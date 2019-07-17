@@ -368,15 +368,13 @@ public class TskFunBug extends JavaPlugin implements Listener {
     if (TskUtils.IsItemEmpty(result)) {
       return;
     }
+    if (TskUtils.GetEnchants(result).isEmpty()) {
+      return;
+    }
 
     Map<Enchantment, Integer> enchants1 = TskUtils.GetEnchants(itemStack1);
-    if (enchants1.isEmpty()) {
-      return;
-    }
     Map<Enchantment, Integer> enchants2 = TskUtils.GetEnchants(itemStack2);
-    if (enchants2.isEmpty()) {
-      return;
-    }
+    Map<Enchantment, Integer> enchants = TskUtils.GetEnchants(result);
 
     int extraCost = 0;
     Map<Enchantment, Integer> enchants3 = new HashMap<>();
@@ -385,14 +383,18 @@ public class TskFunBug extends JavaPlugin implements Listener {
       Map.Entry<Enchantment, Integer> entry1 = iterator1.next();
       if (enchants2.containsKey(entry1.getKey())) {
         int level;
-        if (entry1.getValue().equals(enchants2.get(entry1.getKey()))) {
-          level = entry1.getValue() + 1;
-          if (level > 10) {
-            level = 10;
-          }
-          extraCost = extraCost + level;
+        if (entry1.getKey().getMaxLevel() == 1) {
+          level = 1;
         } else {
-          level = entry1.getValue() > enchants2.get(entry1.getKey()) ? entry1.getValue() : enchants2.get(entry1.getKey());
+          if (entry1.getValue().equals(enchants2.get(entry1.getKey()))) {
+            level = entry1.getValue() + 1;
+            if (level > 10) {
+              level = 10;
+            }
+            extraCost = extraCost + level;
+          } else {
+            level = entry1.getValue() > enchants2.get(entry1.getKey()) ? entry1.getValue() : enchants2.get(entry1.getKey());
+          }
         }
         iterator1.remove();
         enchants2.remove(entry1.getKey());
@@ -400,13 +402,14 @@ public class TskFunBug extends JavaPlugin implements Listener {
       }
     }
 
-
     for (Map.Entry<Enchantment, Integer> entry : enchants1.entrySet()) {
       enchants3.put(entry.getKey(), entry.getValue());
     }
     for (Map.Entry<Enchantment, Integer> entry : enchants2.entrySet()) {
       enchants3.put(entry.getKey(), entry.getValue());
     }
+
+    enchants3.entrySet().removeIf(enchantmentIntegerEntry -> !enchants.containsKey(enchantmentIntegerEntry.getKey()));
 
     ItemMeta resultItemMeta = result.getItemMeta();
     if (resultItemMeta instanceof EnchantmentStorageMeta) {
@@ -425,20 +428,6 @@ public class TskFunBug extends JavaPlugin implements Listener {
       event.getView().getPlayer().sendMessage(String.format("将花费经验%s%d%s级", ChatColor.GREEN, event.getInventory().getRepairCost(), ChatColor.RESET));
     }
   }
-//
-//  String textures = "textures";
-//
-//  String texturesValue = "eyJ0aW1lc3RhbXAiOjE1NjI1MDUzNDY3MzYsInByb2ZpbGVJZCI6IjY3NDg3MTE2ODQxYzQ4MjI4YjJjNWFiMDRmMjBiYTZhIiwicHJvZmlsZU5hbWUiOiJMdXB1c1RleGFzIiwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlL2U5Yjg0MDkzNTIzYzk1Y2U4YTY1MDMxMGE0MmQ5NDU3ZDNhN2VkOGY3YzNhNTc3MTM0MWUzNjUzOTFhMDg0MTAiLCJtZXRhZGF0YSI6eyJtb2RlbCI6InNsaW0ifX19fQ==";
-//
-//  @EventHandler
-//  public void setSkin(PlayerJoinEvent event) {
-//    System.out.println(event.getPlayer().getAddress());
-//    CraftPlayer craftPlayer = (CraftPlayer) event.getPlayer();
-////    craftPlayer.getProfile().getProperties().put(textures, new Property(textures, texturesValue));
-//    for (Field field : craftPlayer.getClass().getFields()) {
-//      System.out.println(field.getName() + "\t" + field.getType());
-//    }
-//  }
 
   @EventHandler
   public void UpgradeOnKill(EntityDeathEvent event) {
@@ -466,5 +455,3 @@ public class TskFunBug extends JavaPlugin implements Listener {
     livingEntity.setRemoveWhenFarAway(false);
   }
 }
-
-
