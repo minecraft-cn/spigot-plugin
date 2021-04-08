@@ -1,0 +1,15 @@
+api-version: "1.16"
+name: ResourceWorld
+main: top.tsk.ResourceWorld
+version: F0310d_dev_JvJv
+author: JvJv, cckk
+website: mc.tsktop.top
+commands:
+  test:
+    usage: '/test <rebuild|destroy>; /test <join|leave|check> [name]'
+    description: 'for test'
+    permisson: 'test.use'
+    permisson-message: 'u dt have the permisson to use this command'
+permissions:
+  test.use:
+    default: op
