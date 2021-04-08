@@ -1,6 +1,0 @@
-api-version: "1.16"
-name: TskResourceWorld
-main: top.tsk.TskResourceWorld
-version: 2020.7.15
-author: jvjv
-website: mc.tsktop.top
